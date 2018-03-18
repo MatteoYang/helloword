@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	 http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.1.xsd   ">
+	<!-- 时区 -->
+	<bean id="timeZone" class="java.util.TimeZone" factory-method="getTimeZone">
+		<constructor-arg value="GMT+08:00" />
+	</bean>
+	 
+ <!-- ======================== 调度工厂开始 ======================== -->
+	<bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<!-- 设置持久化的数据源 -->
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<!-- 设置Quartz的属性 -->
+		<property name="quartzProperties">
+			<props>
+				<!-- 线程池配置 -->
+				<prop key="org.quartz.threadPool.class">${org.quartz.threadPool.class}</prop>
+				<prop key="org.quartz.threadPool.threadCount">${org.quartz.threadPool.threadCount}</prop>									 
+				<prop key="org.quartz.threadPool.threadPriority">${org.quartz.threadPool.threadPriority}</prop>								<!--  -->
+				<prop key="org.quartz.jobStore.misfireThreshold">${org.quartz.jobStore.misfireThreshold}</prop>							<!-- 初始化线程数为20 -->
+				<!-- JobStore 配置，通过数据库存储最终调度程序的配置 -->
+				<prop key="org.quartz.jobStore.class">org.quartz.impl.jdbcjobstore.JobStoreTX</prop>
+				<prop key="org.quartz.jobStore.driverDelegateClass">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</prop>
+				<prop key="org.quartz.jobStore.tablePrefix">${org.quartz.jobStore.tablePrefix}</prop>
+			</props>
+		</property>
+		<property name="startupDelay" value="${quartz.startupDelay}" />
+		<property name="applicationContextSchedulerContextKey" value="applicationContext" />
+		<property name="autoStartup" value="${quartz.autoStartup}" />
+
+		<property name="triggers">
+			<list>
+				 <ref bean="cronTrigger1" />
+			</list>
+		</property>
+	</bean>
+<!-- ======================== 调度工厂结束 ======================== -->
+	 
+	
+<!-- ======================== 定时任务1 开始 ======================== -->
+	<bean id="JobDetail1" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.zkingsoft.quartz.SimpleJob" />					<!-- 必填项：在此处定义job detail -->
+		<property name="name" value="jobName1"></property>									<!-- 必填项：在此处定义job name -->
+		<property name="group" value="jobGroupName1"></property>							<!-- 必填项：在此处定义job group name -->
+		<property name="durability" value="true" />											<!-- 选填项：设置该job是持久性的 -->
+		<property name="requestsRecovery" value="true" />									<!-- 选填项：设置该job是中断后可恢复的 -->
+	</bean>
+	
+	<bean id="cronTrigger1"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="name" value="triggerName1" />										<!-- 必填项：在此处定义trigger name -->
+		<property name="group" value="triggerGroupName1" />									<!-- 必填项：在此处定义trigger group name -->
+		<property name="jobDetail" ref="JobDetail1" />
+		<property name="cronExpression" value="0/10 * * * * ? " />							<!-- 必填项：在此处定义定时任务时间 -->
+		<property name="timeZone" ref="timeZone" />											<!-- 选填项：在此处定义时区 -->
+		<property name="misfireInstruction" value="1" />
+	</bean>
+	<!-- ======================== 定时任务1 结束 ======================== -->
+
+
+</beans>

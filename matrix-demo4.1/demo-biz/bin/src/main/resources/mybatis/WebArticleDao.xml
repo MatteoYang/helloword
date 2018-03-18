@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zkingsoft.dao.WebArticleDao">
+	
+	
+	
+	<!-- 定义WebArticle 的复杂关联map -->
+	<resultMap type="com.zkingsoft.bean.WebArticle" id="WebArticleMap">
+			<id property="artId" column="art_id" />
+			<result property="artTypeId" column="art_type_id" />
+			<result property="artAuthor" column="art_author" />
+			<result property="artTitle" column="art_title" />
+			<result property="artIsPublish" column="art_isPublish" />
+			<result property="artAbstract" column="art_abstract" />
+			<result property="artContent" column="art_content" />
+			<result property="artImage" column="art_image" />
+			<result property="artSort" column="art_sort" />
+			<result property="artCreatetiem" column="art_createtiem" />
+			<result property="artUrl" column="art_url" />
+			<result property="artCount" column="art_count" />
+			<result property="artLables" column="artLables" />
+			<!-- 扩展字段  -->
+			<result property="artTypeName" column="artTypeName" />
+	</resultMap>
+	 
+	
+	
+	
+</mapper>

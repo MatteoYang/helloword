@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation=" http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd  ">
+
+
+
+
+	<!-- 异步配置begin -->
+	<bean id="appFactoryBean" class="com.matrix.async.core.APPFactoryBean">
+		<property name="componentList">
+			<list>
+				<!-- 测试任务1 -->
+				<ref local="testProducer" />
+				<ref local="testComsumer" />
+				<ref local="testTaskQueue" />
+
+				<!-- 测试任务2 -->
+				<ref local="testProducer1" />
+				<ref local="testComsumer1" />
+				<ref local="testTaskQueue1" />
+
+
+				<!--处理长期处于处理中的任务 -->
+				<ref local="recoverOvertimeTask" />
+
+
+			</list>
+		</property>
+		<property name="beanUse" value="true"></property>
+
+	</bean>
+
+	<!-- 处理长期处于处理中的任务 -->
+	<bean id="recoverOvertimeTask" class="com.matrix.async.core.ExceptionHandlerFactoryBean">
+	</bean>
+
+	<bean id="testTaskQueue" class="com.matrix.async.core.TaskQueueFactoryBean">
+		<property name="taskType" value="邮件发送"></property>
+	</bean>
+
+	<bean id="testHandler" class="com.matrix.async.handle.TestHandler"></bean>
+
+
+	<bean id="testProducer" class="com.matrix.async.core.ProducerFactoryBean">
+		<property name="taskType" value="邮件发送"></property>
+		<property name="taskQueue" ref="testTaskQueue"></property>
+		<property name="taskHandler" ref="testHandler"></property>
+		<property name="beanUse" value="true"></property>
+		<property name="batchSize" value="5"></property>
+
+	</bean>
+
+	<bean id="testComsumer" class="com.matrix.async.core.ComsumerFactoryBean">
+		<property name="taskType" value="邮件发送"></property>
+		<property name="taskQueue" ref="testTaskQueue"></property>
+		<property name="beanUse" value="true"></property>
+	</bean>
+
+	<!-- 短信任务 -->
+
+	<bean id="testTaskQueue1" class="com.matrix.async.core.TaskQueueFactoryBean">
+		<property name="taskType" value="短信发送"></property>
+	</bean>
+
+	<bean id="testHandler1" class="com.matrix.async.handle.TestHandler1"></bean>
+
+
+	<bean id="testProducer1" class="com.matrix.async.core.ProducerFactoryBean">
+		<property name="taskType" value="短信发送"></property>
+		<property name="taskQueue" ref="testTaskQueue1"></property>
+		<property name="taskHandler" ref="testHandler1"></property>
+		<property name="beanUse" value="true"></property>
+		<property name="batchSize" value="5"></property>
+
+	</bean>
+
+	<bean id="testComsumer1" class="com.matrix.async.core.ComsumerFactoryBean">
+		<property name="taskType" value="短信发送"></property>
+		<property name="taskQueue" ref="testTaskQueue1"></property>
+		<property name="beanUse" value="true"></property>
+	</bean>
+
+	<!-- 短信任务 -->
+
+
+	<!-- 异步配置end -->
+
+
+
+</beans>

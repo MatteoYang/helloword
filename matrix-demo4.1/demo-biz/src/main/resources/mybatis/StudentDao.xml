@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zkingsoft.dao.StudentDao">
+	
+	<resultMap type="com.zkingsoft.bean.Student" id="studentMap">
+			
+			<id property="stuId" column="stu_id" />
+			
+			<result property="createBy" column="create_by" />
+			<result property="createTime" column="create_time" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateTime" column="update_time" />
+			<result property="stuAge" column="stu_age"/>
+			<result property="stuName" column="stu_name" />
+			<result property="stuSex" column="stu_sex" />
+			<result property="stuClass" column="stu_class" />
+	</resultMap>
+	 
+	
+	
+	
+	<!--  插入方法   -->
+	<insert id="insert" parameterType="com.zkingsoft.bean.Student"
+		useGeneratedKeys="true" keyProperty="stuId">
+		INSERT INTO biz_student (
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			stu_id,
+			stu_name,
+			stu_sex,
+			stu_age,
+			stu_class
+		)
+	VALUES (
+			#{createBy},
+			now(),
+			#{updateBy},
+			now(),
+			#{stuId},
+			#{stuName},
+			#{stuSex},
+			#{stuAge},
+			#{stuClass}
+	)
+	</insert>
+	
+	<!--  根据Map更新 部分更新   -->
+	<update id="updateByMap" parameterType="java.util.HashMap" >
+		UPDATE biz_student
+		<set>
+			update_time=now(),
+			<if test="_parameter.containsKey('updateBy')">
+			update_by=#{updateBy},
+			</if>
+			<if test="_parameter.containsKey('stuName')">
+					stu_name = #{stuName},
+				</if>		
+			<if test="_parameter.containsKey('stuSex')">
+					stu_sex = #{stuSex},
+				</if>		
+			<if test="_parameter.containsKey('stuAge')">
+					stu_age = #{stuAge},
+				</if>		
+			<if test="_parameter.containsKey('stuClass')">
+					stu_class = #{stuClass},
+				</if>		
+			 
+		</set>
+		WHERE stu_id=#{stuId} 
+	</update>
+	
+	 
+	
+	
+	<!-- 批量删除 -->
+	<delete id="deleteByIds" parameterType="java.util.List">
+		delete from biz_student where  stu_id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+		
+	  
+	
+	
+	
+	<!-- 分页查询 -->
+	<select id="selectInPage" resultMap="studentMap">
+		select * from biz_student
+		<trim prefix="where" prefixOverrides="and">
+			<if test="record!=null">
+				<if test="record.stuClass!=null and record.stuClass!=''">
+					stu_class  = #{record.stuClass} 
+				</if>
+				<if test="record.stuSex!=null and record.stuSex!=''">
+					and stu_sex  = #{record.stuSex} 
+				</if>
+			</if>
+		</trim>
+		<if test="pageVo !=null"><!-- 判断pageVo对象是否为空 -->
+			<if test="pageVo.sort !=null  and pageVo.order !=null">
+				order by
+				${pageVo.sort} ${pageVo.order}
+			</if>
+			<if test="pageVo.offset >=0  and pageVo.limit >0">
+				limit
+				#{pageVo.offset},#{pageVo.limit}
+			</if>
+		</if>
+	</select>
+	
+	<!-- 查询总条数 -->
+	<select id="selectTotalRecord" parameterType="long"   resultType="java.lang.Integer">
+	select count(*)
+	from biz_student
+		<trim prefix="where" prefixOverrides="and">
+			<if test="record!=null">
+				<if test="record.stuClass!=null and record.stuClass!=''">
+					stu_class  = #{record.stuClass} 
+				</if>
+				<if test="record.stuSex!=null and record.stuSex!=''">
+					and stu_sex  = #{record.stuSex} 
+				</if>
+			</if>
+		</trim>
+	</select>
+
+	<!-- 根据id查询-->
+	<select id="selectById"  resultType="java.lang.Integer">
+		select *
+		from biz_goods
+		where  stu_id=#{stuId} 
+	</select>	
+	 <!-- 根据ID删除 -->
+	 <delete id="deleteById">
+	 delete from biz_student where stu_id=#{stuId}
+	 </delete>
+	 <!--模糊查找  -->
+	 <select id="selectByModel" resultMap="studentMap">
+	 	select * from biz_student 
+	 	<where>
+	 		<if test="_parameter.containsKey('updateBy')">
+			update_by=#{updateBy},
+			</if>
+			<if test="_parameter.containsKey('stuName')">
+					stu_name = #{stuName},
+				</if>		
+			<if test="_parameter.containsKey('stuSex')">
+					stu_sex = #{stuSex},
+				</if>		
+			<if test="_parameter.containsKey('stuAge')">
+					stu_age = #{stuAge},
+				</if>		
+			<if test="_parameter.containsKey('stuClass')">
+					stu_class = #{stuClass},
+				</if>		
+	 	</where>
+	 </select>
+</mapper>
